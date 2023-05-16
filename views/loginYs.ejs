@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href='/stylesheets/ylogin.css' />
+
+<title>原神登录页面</title>
+</head>
+
+<body>
+    <div class="box">
+      <div class="left"></div>
+        <div class="right">
+            <h4>原 神 登 录</h4>
+            <form class="form">
+                <input class="acc" id="username" type="text" placeholder="用户名">
+                <input class="acc" id="password" type="password" placeholder="密码">
+                <input class="submit" type="button" value="Login" onclick="toLogin()">
+            </form>
+            <div class="fn">
+                <a href="javascript:;">注册账号</a>
+                <a href="/login">切换</a>
+                <a href="javascript:;">找回密码</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script>
+      async function toLogin() {
+        let _data = $('#username')
+        let _data1 = $('#password')
+        console.log(_data.val());
+        console.log(_data1.val());
+        const data = await axios.post("/user/login",{
+          username:_data.val(),
+          password:_data1.val()
+        })
+        console.log(data.data);
+        if(data.data.code == "-1"){
+          window.alert("登陆失败")
+        }else{
+          window.open("/homeYs")
+          let {data:userInfo} = data.data;
+          let _stf_ = JSON.stringify(userInfo);
+          localStorage.setItem("userInfo",_stf_)
+        }
+  
+      }
+    </script>
+</body>
+

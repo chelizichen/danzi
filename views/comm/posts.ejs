@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <input id="fileupload" type="file" class="form-control" name="file">
+    <script>
+        $("#fileupload").on("change", function () {
+            var file = this.files[0];
+            var data = new FormData();
+            data.append("file", file);
+            console.log(data);
+            console.log(file);
+            $.ajax({
+                type: "post",
+                url: "/picLoad",
+                data: data,
+                contentType: false,
+                //默认文件类型application/x-www-form-urlencoded  设置之后multipart/form-data
+                processData: false,
+                // 默认情况下会对发送的数据转化为对象 不需要转化的信息
+                success: function (res) {
+                    source = res.picAddr;
+                },
+            });
+        })
+
+    </script>
+</body>
+
+</html>

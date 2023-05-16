@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>米哈游社区</title>
+    <script>
+        function toUserInfo(){
+			let _userInfo = localStorage.getItem("userInfo")
+			let userInfo = JSON.parse(_userInfo)
+			let { id } = userInfo
+			window.open("/userInfo/"+id);
+		}
+		function toCommunity(){
+			let _userInfo = localStorage.getItem("userInfo")
+			let userInfo = JSON.parse(_userInfo)
+			let { id } = userInfo
+			window.open("/community/"+id);
+		}
+    </script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .mynav  a {
+            /* text-align: center; */
+            color: #EE9B36;
+            font-size: 24px;
+            font-family: Constantia, "Lucida Bright", "DejaVu Serif", Georgia, serif;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .mynav a {
+			margin: 10px 20px;
+		}
+        .mynav span{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mynav{
+            background-color: #1f2233;
+        }
+    </style>
+</head>
+<body>
+    <nav class="mynav">
+        <span
+            style="font-size: 16px; font-family: Segoe, 'Segoe UI', 'DejaVu Sans', 'Trebuchet MS', Verdana, sans-serif; color: #EFE5E5;">
+            <a href="/homeYs">首页</a>
+            <a href="/loginYs">登录</a>
+            <a href="/news">新闻</a>
+            <a href="/ys/roles">角色</a>
+            <a href="/ys/world">世界</a>
+            <a href="https://ys.mihoyo.com/main/manga">漫画</a>
+            <a onclick="toCommunity()">社区</a>
+            <a onclick="toUserInfo()">信使</a>
+            <a href="#">版本更新</a>
+        </span>
+    </nav>
+    <div>
+        <div>
+            <div>发布帖子</div>
+            <div>发布图片</div>
+        </div>
+    </div>
+    
+</span>
+</body>
+</html>
