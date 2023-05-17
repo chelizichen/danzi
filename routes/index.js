@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const { pool } = require('../db');
 const multer = require('multer');
-const { getPostList } = require('./posts');
+const { getPostList,getPostById } = require('./posts');
 var upload = multer({ dest: '/public/posts/' })
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -55,7 +55,7 @@ router.get('/userInfo/:id', function(req, res, next) {
 
 router.get('/community/:id', async function(req, res) {
   const {id} = req.params;
-  const data = await getPostList()
+  const data = await getPostById(id)
   console.log(data);
   res.render('community',{
     list:data
