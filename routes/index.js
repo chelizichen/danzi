@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const { pool } = require('../db');
-const multer = require('multer')
+const multer = require('multer');
+const { getPostList } = require('./posts');
 var upload = multer({ dest: '/public/posts/' })
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -41,7 +42,7 @@ router.get('/ys/world', function(req, res, next) {
 
 router.get('/userInfo/:id', function(req, res, next) {
   const {id} = req.params;
-  pool.query('select * from user where id = ?',[id],(ERR,VAL)=>{
+  pool.query('select * from user where userId = ?',[id],(ERR,VAL)=>{
     if(ERR){
       throw Error(ERR)
     }
@@ -52,9 +53,13 @@ router.get('/userInfo/:id', function(req, res, next) {
   })
 });
 
-router.get('/community/:id', function(req, res) {
+router.get('/community/:id', async function(req, res) {
   const {id} = req.params;
-  res.render('community')
+  const data = await getPostList()
+  console.log(data);
+  res.render('community',{
+    list:data
+  })
 });
 
 router.get('/posts', function(req, res) {

@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var postsRouter = require('./routes/posts');
+var {router:postsRouter} = require('./routes/posts');
 
 
 var app = express();

@@ -1,22 +1,102 @@
 var express = require('express');
 var router = express.Router();
 const { pool } = require('../db');
+const moment = require('moment')
 
-router.get("/getPostsById",function(req,res){
-    const {id} = req;
-    pool.query('select p from post p where p.userId = ',[id],(err,val)=>{
-        if(err){
-            res.end({
-                code:"-1",
-                msg:"请求失败"
-            })
-        }
-        res.json({
-            code:'0',
-            data:val
+async function getPostById(id) {
+    return new Promise((resolve, reject) => {
+        pool.query(`select posts.*,user.*,
+        case 
+            When posts.type = 1 Then '原神'
+            When posts.type = 2 Then '崩坏三' 
+            Else "原神"
+        End As detailType
+            from posts,user
+         where user.userId = ? and posts.userId = ? `, [id, id], (err, val) => {
+            if (err) {
+                reject(err)
+            }
+            resolve(val)
         })
     })
+}
+
+router.get("/getPostsById", async function (req, res) {
+    const { id } = req.query;
+    try {
+        let data = await getPostById(id)
+        res.json({
+            code: '0',
+            data
+        })
+    } catch (e) {
+        res.end({
+            code: "-1",
+            msg: "请求失败"
+        })
+    }
 })
 
 
-module.exports = router;
+function getPostList(page = 1, size = 10) {
+    return new Promise((resolve, reject) => {
+        page = (page - 1) * size;
+        size = (page + 1) * size
+        pool.query(`select posts.*,user.*,
+        case 
+            When posts.type = 1 Then '原神'
+            When posts.type = 2 Then '崩坏三' 
+            Else "原神"
+        End As detailType
+            from posts 
+        Left Join user
+        On posts.userId = user.userId
+        Limit ?,?`, [page, size], (err, val) => {
+            if (err) {
+                reject(err)
+            }
+
+            let currentTime = moment()
+            let _data = val;
+
+            let data = _data.map(item=>{
+                // let _time = moment.ismoment(item.releaseTime)
+                
+                // 假设要判断的时间是 "2023-05-16 15:30:00"
+                var targetTime = moment(item.releaseTime);
+
+                // 判断时间是否为今天
+                if (targetTime.isSame(currentTime, 'day')) {
+                    // 如果是今天，则显示几个小时前
+                    var hoursAgo = currentTime.diff(targetTime, 'hours');
+                    item.releaseTime = hoursAgo + '小时前';
+                } else {
+                    // 如果不是今天，则显示几月几日
+                    var formattedDate = targetTime.format('MMMM DD');
+                    item.releaseTime = formattedDate
+                }
+                return item
+            })
+            
+            resolve(data)
+        })
+    })
+}
+
+router.get("/list", async function (req, res) {
+    const { page, size } = req.query;
+    try {
+        const data = await getPostList(page, size)
+        res.send(data)
+    } catch (e) {
+        throw Error(e)
+    }
+})
+
+
+module.exports = {
+    router,
+    getPostById,
+    getPostList
+};
+

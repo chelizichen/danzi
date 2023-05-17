@@ -2,71 +2,221 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>米哈游社区</title>
+    <title>Community Forum - Post List</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <script>
-        function toUserInfo(){
-			let _userInfo = localStorage.getItem("userInfo")
-			let userInfo = JSON.parse(_userInfo)
-			let { id } = userInfo
-			window.open("/userInfo/"+id);
-		}
-		function toCommunity(){
-			let _userInfo = localStorage.getItem("userInfo")
-			let userInfo = JSON.parse(_userInfo)
-			let { id } = userInfo
-			window.open("/community/"+id);
-		}
+        // axios.get("/post/getPostsById",{params:{id:"1"}}).then(res=>{
+        //     console.log(res);
+        // })
     </script>
     <style>
         *{
             margin: 0;
             padding: 0;
         }
-        .mynav  a {
-            /* text-align: center; */
-            color: #EE9B36;
-            font-size: 24px;
-            font-family: Constantia, "Lucida Bright", "DejaVu Serif", Georgia, serif;
-            font-weight: bold;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        header nav {
+            margin: 20px 0 0 0 ;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
             text-decoration: none;
         }
-        .mynav a {
-			margin: 10px 20px;
-		}
-        .mynav span{
+
+        main {
+            margin: 20px;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 0 0 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        li:hover {
+            background-color: #f4f4f4;
+        }
+
+        #post-list{
+            width: 100%;
+        }
+        .post-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .post-content {
+            margin-bottom: 5px;
+        }
+
+        .post-meta {
+            color: #777;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: -10px;
+        }
+        .main{
+            width: 50%;
+            margin:  30px 25%;
+        }
+        .btn-follow{
+            background-color: #1DA1F2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-follow:hover{
+            background-color: #0C8FD6;
+        }
+        .post-user{
+            font-size: 24px;
+        }
+        .post-user .post-time{
+            font-size: 14px;
+            font-weight: 400;
+            margin-left: 5px;
+        }
+        .post-item{
+            padding: 20px;
+        }
+        .post-level{
+            font-size: 12px;
+            font-weight: 700;
+            width: 40px;
+            height: 12px;
+            line-height: 12px;
+            background-color: gold;
+            color: #fff;
+            margin-left: 5px;
+        }
+        .post-img{
+            width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        .post-type{
+            font-size: 12px;
+            font-weight: 700;
+            height: 16px;
+            /* width: 34px; */
+            padding: 3px;
+            line-height: 12px;
+            background-color:#1DA1F2;
+            color: #fff;
+            margin-left: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .mynav{
-            background-color: #1f2233;
-        }
+
     </style>
 </head>
 <body>
-    <nav class="mynav">
-        <span
-            style="font-size: 16px; font-family: Segoe, 'Segoe UI', 'DejaVu Sans', 'Trebuchet MS', Verdana, sans-serif; color: #EFE5E5;">
-            <a href="/homeYs">首页</a>
-            <a href="/loginYs">登录</a>
-            <a href="/news">新闻</a>
-            <a href="/ys/roles">角色</a>
-            <a href="/ys/world">世界</a>
-            <a href="https://ys.mihoyo.com/main/manga">漫画</a>
-            <a onclick="toCommunity()">社区</a>
-            <a onclick="toUserInfo()">信使</a>
-            <a href="#">版本更新</a>
-        </span>
-    </nav>
-    <div>
-        <div>
-            <div>发布帖子</div>
-            <div>发布图片</div>
-        </div>
-    </div>
-    
-</span>
+    <header>
+        <h1>米哈游社区</h1>
+        <nav>
+            <ul>
+                <li><a href="#">首页</a></li>
+                <li><a href="#">登录</a></li>
+                <li><a href="#">新闻</a></li>
+                <li><a href="#">角色</a></li>
+                <li><a href="#">世界</a></li>
+                <li><a href="#">漫画</a></li>
+                <li><a href="#">社区</a></li>
+                <li><a href="#">信使</a></li>
+                <li><a href="#">版本更新</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="main">
+        <section id="post-list">
+            <ul>
+                <% for(var i=0; i<list.length; i++) {%>
+                <% let item = list[i] %>
+                <li class="post-item">
+                    <div class="post-info" >
+                        <div class="post-user">
+                            <%= item.truthName   %> 
+                            <span class="post-level"> Lv<%= item.level %> </span> 
+                            <span class="post-time"> <%= item.releaseTime %> </span> 
+                        </div>
+                        <div class="btn-follow">
+                            关注
+                        </div>
+                    </div>
+                    <div href="#" class="post-title"> <%= item.title  %></div>
+                    <p class="post-content"> <%= item.content  %> </p>
+                    <img src="/posts/<%= item.img %>" class="post-img"/>
+                    <div class="post-meta">
+                        <div class="post-type"><%= item.detailType %> </div> 
+                        <div>
+                            <i class="fa fa-eye" aria-hidden="true"></i> <%= item.views  %>  <i class="fa fa-thumbs-up" aria-hidden="true"></i>  <%= item.like  %> | <i class="fa fa-comment" aria-hidden="true"></i> <%= item.like  %>
+                        </div>
+
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Community Forum. All rights reserved.</p>
+    </footer>
 </body>
 </html>
