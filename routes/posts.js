@@ -3,6 +3,40 @@ var router = express.Router();
 const { pool } = require('../db');
 const moment = require('moment')
 
+async function getById(id) {
+
+    return new Promise((resolve, reject) => {
+        pool.query(`select * from posts,user where id = ? and posts.userId = user.userId`, [id], (err, val) => {
+            if (err) {
+                reject(err)
+            }
+            let currentTime = moment()
+            let _data = val;
+            let data = _data.map(item=>{
+                // let _time = moment.ismoment(item.releaseTime)
+                
+                // 假设要判断的时间是 "2023-05-16 15:30:00"
+                var targetTime = moment(item.releaseTime);
+
+                // 判断时间是否为今天
+                if (targetTime.isSame(currentTime, 'day')) {
+                    // 如果是今天，则显示几个小时前
+                    var hoursAgo = currentTime.diff(targetTime, 'hours');
+                    item.releaseTime = hoursAgo + '小时前';
+                } else {
+                    // 如果不是今天，则显示几月几日
+                    var formattedDate = targetTime.format('MMMM DD');
+                    item.releaseTime = formattedDate
+                }
+                return item
+            })
+            
+            resolve(data[0])
+        })
+    })
+}
+
+// 通过用户Id
 async function getPostById(id,page = 1, size = 10) {
     page = (page - 1) * size;
     size = (page + 1) * size
@@ -142,9 +176,48 @@ router.get("/addView",async function(req,res){
 })
 
 
+function getDetailByPostId(id){
+    return new Promise((resolve, reject) => {
+        pool.query(`
+        SELECT
+        follows.*,
+        u1.username AS toUserDetail,
+        u2.username AS userDetail,
+        u2.avatar AS userAvatar,
+        u3.avatar AS toUserAvatar
+      FROM
+        follows
+        INNER JOIN user AS u1 ON follows.toUserId = u1.userId
+        INNER JOIN user AS u2 ON follows.userId = u2.userId
+        INNER JOIN user AS u3 ON follows.toUserId = u3.userId
+      WHERE
+        follows.postId = ?;
+        `,[id],function(err,res){
+            if(err){
+                reject(err)
+            }
+            resolve(res)
+        })
+    })
+}
+
+router.get("/getDetailByPostId",async function(req,res){
+    const {id} = req.query
+    try{
+        const data = await getDetailByPostId(id)
+        res.send(data)
+    }catch(e){
+        throw new Error(e)
+    }
+    
+
+})
+
 module.exports = {
     router,
     getPostById,
-    getPostList
+    getPostList,
+    getDetailByPostId,
+    getById
 };
 

@@ -10,6 +10,9 @@
         // axios.get("/post/getPostsById",{params:{id:"1"}}).then(res=>{
         //     console.log(res);
         // })
+        function toDetail(id){
+            window.location.href = "/detail?id="+id
+        }
     </script>
     <style>
         *{
@@ -200,7 +203,7 @@
                             <%= item.isConcern %>
                         </div>
                     </div>
-                    <div href="#" class="post-title"> <%= item.title  %></div>
+                    <div onclick="toDetail('<%= item.id%>')" class="post-title"> <%= item.title  %></div>
                     <p class="post-content"> <%= item.content  %> </p>
                     <img src="/posts/<%= item.img %>" class="post-img"/>
                     <div class="post-meta">

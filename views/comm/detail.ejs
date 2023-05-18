@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Post Detail</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .post-content {
+            margin-bottom: 20px;
+        }
+
+        .post-author {
+            font-weight: bold;
+        }
+
+        .comment {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .comment-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .comment-actions button {
+            margin-right: 10px;
+        }
+
+        .contents {
+            width: 50%;
+            margin: 0 25%;
+        }
+
+        .submit {
+            width: 60%;
+            height: 5rem;
+            color: #f6f6f6;
+            background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 0.5rem;
+            margin: 1rem 0 0 50%;
+            transform: translateX(-50%);
+        }
+
+        .comment-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .reply-button {
+            margin-right: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .reply-button:hover {
+            background-color: #454545;
+        }
+    </style>
+    <script>
+        let currId = 0;
+        function comment(vm){
+            let _data = $(vm).attr("attr-id")
+            currId = _data
+            let _name = $(vm).attr("attr-name")
+            console.log(_name);
+            $("#comment").val(`回复${_name}：`)
+        }
+    </script>
+</head>
+
+<body>
+    <div class="contents">
+        <h1>
+            <%= data.title %> <span style="font-size: 24px;"> By <%= data.username %></span>
+        </h1>
+        <div class="post-content">
+            <%= data.content %>
+        </div>
+
+        <% for(var i=0; i<list.length; i++) {%>
+            <% let item=list[i] %>
+                <div class="comment">
+                    <div class="comment-author">
+                        <%= item.userDetail %> <span>回复</span>
+                            <%= item.toUserDetail %>
+                    </div>
+                    <p>
+                        <%= item.content %>
+                    </p>
+                    <div class="comment-actions">
+                        <div>
+                            <i class="fa fa-thumbs-up" aria-hidden="true"
+                                style="color: #1DA1F2;cursor: pointer;"></i><span>
+                                <%= item.like %>
+                            </span>
+
+                            <i class="fa fa-thumbs-down" aria-hidden="true" style="cursor: pointer;"></i><span>
+                                <%= item.disLike %>
+                            </span>
+                        </div>
+                        <button class="reply-button" onclick="comment(this)" attr-id="<%= item.userId%> " attr-name="<%= item.userDetail %>">回复</button>
+                    </div>
+                </div>
+                <% } %>
+
+                    <div>
+                        <h2>添加评论</h2>
+                        <form>
+                            <textarea id="comment" name="comment" rows="6" style="width: 100%;" required></textarea><br>
+                            <button class="submit">Submit</button>
+                        </form>
+                    </div>
+    </div>
+</body>
+
+</html>

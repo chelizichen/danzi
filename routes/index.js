@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const { pool } = require('../db');
 const multer = require('multer');
-const { getPostList,getPostById } = require('./posts');
+const { getPostList,getPostById,getDetailByPostId,getById } = require('./posts');
 var upload = multer({ dest: '/public/posts/' })
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -66,6 +66,19 @@ router.get('/posts', function(req, res) {
   const {id} = req.params;
   res.render('comm/posts')
 });
+
+router.get('/detail', async function(req, res) {
+  const {id} = req.query;
+  const data = await getDetailByPostId(id)
+  const _data = await getById(id)
+  console.log(data);
+  res.render('comm/detail',{
+    id,
+    list:data,
+    data:_data
+  })
+});
+
 
 router.post("/picLoad",upload.single('file'),function(req,res){
   const {body} = req;
