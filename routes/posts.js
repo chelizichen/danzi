@@ -3,18 +3,35 @@ var router = express.Router();
 const { pool } = require('../db');
 const moment = require('moment')
 
-async function getById(id) {
-
+async function getById(id, page = 1, size = 10) {
+    page = (page - 1) * size;
+    size = (page + 1) * size
     return new Promise((resolve, reject) => {
-        pool.query(`select * from posts,user where id = ? and posts.userId = user.userId`, [id], (err, val) => {
+        pool.query(`select posts.*,user.*,
+        case 
+            When posts.type = 1 Then '原神'
+            When posts.type = 2 Then '崩坏三' 
+            Else "原神"
+        End As detailType,
+				case 
+					When posts.userId not in (SELECT concern.concernUserId from concern where concern.userId = ?) then '关注'
+					When posts.userId in (SELECT concern.concernUserId from concern where concern.userId = ?) then '已关注'
+				END AS isConcern ,
+                (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
+            from posts
+        Left Join user
+        On posts.userId = user.userId 
+        where posts.userId = ?
+        Limit ?,? `, [id, id,id, page, size], (err, val) => {
             if (err) {
                 reject(err)
             }
             let currentTime = moment()
             let _data = val;
-            let data = _data.map(item=>{
+
+            let data = _data.map(item => {
                 // let _time = moment.ismoment(item.releaseTime)
-                
+
                 // 假设要判断的时间是 "2023-05-16 15:30:00"
                 var targetTime = moment(item.releaseTime);
 
@@ -30,15 +47,15 @@ async function getById(id) {
                 }
                 return item
             })
-            
-            resolve(data[0])
+
+            resolve(data)
         })
     })
 }
 
 // 通过用户Id
 // 5.19 添加跟帖数量字段
-async function getPostById(id,page = 1, size = 10) {
+async function getPostById(id, page = 1, size = 10) {
     page = (page - 1) * size;
     size = (page + 1) * size
     return new Promise((resolve, reject) => {
@@ -55,16 +72,16 @@ async function getPostById(id,page = 1, size = 10) {
                 (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
             from posts 
         Left Join user
-        On posts.userId = user.userId Limit ?,? `, [id, id,page,size], (err, val) => {
+        On posts.userId = user.userId Limit ?,? `, [id, id, page, size], (err, val) => {
             if (err) {
                 reject(err)
             }
             let currentTime = moment()
             let _data = val;
 
-            let data = _data.map(item=>{
+            let data = _data.map(item => {
                 // let _time = moment.ismoment(item.releaseTime)
-                
+
                 // 假设要判断的时间是 "2023-05-16 15:30:00"
                 var targetTime = moment(item.releaseTime);
 
@@ -80,7 +97,7 @@ async function getPostById(id,page = 1, size = 10) {
                 }
                 return item
             })
-            
+
             resolve(data)
         })
     })
@@ -124,9 +141,9 @@ function getPostList(page = 1, size = 10) {
             let currentTime = moment()
             let _data = val;
 
-            let data = _data.map(item=>{
+            let data = _data.map(item => {
                 // let _time = moment.ismoment(item.releaseTime)
-                
+
                 // 假设要判断的时间是 "2023-05-16 15:30:00"
                 var targetTime = moment(item.releaseTime);
 
@@ -142,7 +159,7 @@ function getPostList(page = 1, size = 10) {
                 }
                 return item
             })
-            
+
             resolve(data)
         })
     })
@@ -158,27 +175,27 @@ router.get("/list", async function (req, res) {
     }
 })
 
-function addView(id){
-    return new Promise((resolve,reject)=>{
-        pool.query('UPDATE posts SET views = views + 1 WHERE id = ?',[id],(ERR,RES)=>{
-            if(ERR){
+function addView(id) {
+    return new Promise((resolve, reject) => {
+        pool.query('UPDATE posts SET views = views + 1 WHERE id = ?', [id], (ERR, RES) => {
+            if (ERR) {
                 reject(ERR)
             }
             resolve(RES)
-        })        
+        })
     })
 }
 
 
 
-router.get("/addView",async function(req,res){
-    const {id} = req.query;
+router.get("/addView", async function (req, res) {
+    const { id } = req.query;
     const data = await addView(id)
     res.send(data)
 })
 
 
-function getDetailByPostId(id){
+function getDetailByPostId(id) {
     return new Promise((resolve, reject) => {
         pool.query(`
         SELECT
@@ -194,8 +211,8 @@ function getDetailByPostId(id){
         INNER JOIN user AS u3 ON follows.toUserId = u3.userId
       WHERE
         follows.postId = ?;
-        `,[id],function(err,res){
-            if(err){
+        `, [id], function (err, res) {
+            if (err) {
                 reject(err)
             }
             resolve(res)
@@ -203,18 +220,18 @@ function getDetailByPostId(id){
     })
 }
 
-router.get("/getDetailByPostId",async function(req,res){
-    const {id} = req.query
-    try{
+router.get("/getDetailByPostId", async function (req, res) {
+    const { id } = req.query
+    try {
         const data = await getDetailByPostId(id)
         res.send(data)
-    }catch(e){
+    } catch (e) {
         throw new Error(e)
     }
 })
 
-function savePost(item){
-    const {postId , toUserId ,content,like = "0",disLike = "0" , userId } = item;
+function saveFollows(item) {
+    const { postId, toUserId, content, like = "0", disLike = "0", userId } = item;
     const releaseTime = moment(moment.now()).format("YYYY-MM-DD hh:mm:ss")
     return new Promise((resolve, reject) => {
         pool.query(`
@@ -229,24 +246,64 @@ function savePost(item){
             )values(
                 ?,?,?,?,?,?,?
             )
-            `,[Number(postId),Number(toUserId),content,like,disLike,Number(userId),releaseTime],function(err,res){
-                if(err){
-                    reject(err)
-                }
-                resolve(res)
-            })
+            `, [Number(postId), Number(toUserId), content, like, disLike, Number(userId), releaseTime], function (err, res) {
+            if (err) {
+                reject(err)
+            }
+            resolve(res)
+        })
     })
 }
 
-router.post("/savePost",async function(req,res){
-    const {body} = req;
-    try{
-        const data = await savePost(body)
+router.post("/saveFollows", async function (req, res) {
+    const { body } = req;
+    try {
+        const data = await saveFollows(body)
         res.send(data)
-    }catch(e){
+    } catch (e) {
         throw new Error(e)
     }
 })
+
+
+function savePosts(item) {
+    let { title, type, views = 0, likes = 0, content, img, userId } = item;
+    img = img.replace("public/posts/","")
+    const releaseTime = moment(moment.now()).format("YYYY-MM-DD hh:mm:ss")
+    return new Promise((resolve, reject) => {
+        pool.query(`
+        insert into posts (
+            title,
+            releaseTime,
+            type,
+            views,
+            likes,
+            content,
+            img,
+            userId
+            )values(
+                ?,?,?,?,?,?,?,?
+            )
+            `, [title,releaseTime,type,views,likes,content,img,userId], function (err, res) {
+            if (err) {
+                reject(err)
+            }
+            resolve(res)
+        })
+    })
+}
+
+router.post("/savePosts", async function (req, res) {
+    const { body } = req;
+    try {
+        const data = await savePosts(body)
+        res.send(data)
+    } catch (e) {
+        throw new Error(e)
+    }
+})
+
+
 
 module.exports = {
     router,

@@ -3,8 +3,6 @@
 <head>
   <title>发布帖子</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
   <style>
     /* 自定义样式 */
     form {
@@ -45,43 +43,26 @@
     </div>
 
     <div class="form-group">
-        原神：<input type="radio"  id="r-ys" name="TYPE" value="1" onclick="selectYs()"/>
-        崩三：<input type="radio"  id="r-bs" name="TYPE" value="2" onclick="selectBs()"/>
-    </div>
-
-    <div class="form-group">
       <label for="image">图片上传</label>
       <!-- <input type="file" id="image" name="file" class="form-control-file"> -->
       <input id="fileupload"  id="image" type="file" class="form-control-file" name="file">
     </div>
-
-    <div class="form-group" onclick="submit()">
-        <button type="button" class="btn btn-primary">提交</button>
-    </div>
-
+    <input id="fileupload" type="file" class="form-control" name="file">
   </form>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
-
-    let type = ""
     let picUrl = ""
+    $(document).ready(function() {
+      $('#postForm').submit(function(event) {
+        event.preventDefault();
 
-    function selectYs(){
-      type = 1
-    }
-    function selectBs(){
-      type = 2
-    }
-
-    function submit(){
         var title = $('#title').val();
         var content = $('#content').val();
-        var isYs = $('#r-ys').val();
-        var isBs = $('#r-bs').val();
         // 获取文件对象
-        var img = picUrl;
+        var file = $('#image')[0].files[0];
+
 
         const _userInfo = localStorage.getItem("userInfo")
         const userInfo = JSON.parse(_userInfo)
@@ -89,29 +70,12 @@
         const data = {
             title,
             content,
-            img:picUrl,
-            type,
+            file,
             userId: userInfo.userId || userInfo.id
         }
+        
 
-        axios.post("/post/savePosts",data).then(res=>{
-                console.log(res);
-                if(res.data.affectedRows >= 1){
-                    alert("发布成功")
-                    // window.ref
-                }
-            })
-
-        console.log(data);
-    }
-
-    $("#fileupload").on("change", function () {
-            var file = this.files[0];
-            var data = new FormData();
-            data.append("file", file);
-            console.log(data);
-            console.log(file);
-            $.ajax({
+        $.ajax({
                 type: "post",
                 url: "/picLoad",
                 data: data,
@@ -120,12 +84,19 @@
                 processData: false,
                 // 默认情况下会对发送的数据转化为对象 不需要转化的信息
                 success: function (res) {
-                    // source = res.picAddr;
-                    picUrl = res
+                    source = res.picAddr;
                 },
             });
-        })
-        
+
+
+        // 清空表单字段
+        $('#title').val('');
+        $('#content').val('');
+        $('#image').val('');
+
+        alert('帖子发布成功！');
+      });
+    });
   </script>
 </body>
 </html>

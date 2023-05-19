@@ -137,7 +137,7 @@
                 userId: userInfo.userId || userInfo.id
             }
 
-            axios.post("/post/savePost",item).then(res=>{
+            axios.post("/post/saveFollows",item).then(res=>{
                 console.log(res);
                 if(res.data.affectedRows >= 1){
                     alert("评论成功")

@@ -18,6 +18,23 @@
             location.href = path
         }
 
+        function logout(){
+            alert("您已退出登录")
+            location.href = "/login"
+        }
+
+        function showMyPosts(){
+            let item = JSON.parse(localStorage.getItem("userInfo"))
+            let userId = item.userId || item.id
+            location.href = "/community/"+userId +"?only=true"
+        }
+
+        function showAllPosts(){
+            let item = JSON.parse(localStorage.getItem("userInfo"))
+            let userId = item.userId || item.id
+            location.href = "/community/"+userId
+        }
+
     </script>
     <style>
         *{
@@ -260,10 +277,17 @@
     <div>
         <div class="card-widget card-announcement">
             <div class="card-content">
-                <div class="item-headline admin">
+                <% if(only) {%>
+                <div class="item-headline admin" onclick="showAllPosts()">
                     <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                    我的发帖
+                    全部发帖
                 </div>
+                <%}else{%>
+                    <div class="item-headline admin" onclick="showMyPosts()">
+                        <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                        我的发帖
+                    </div>
+                <%}%>
                 <div class="item-headline admin">
                     <i class="fa fa-exchange" aria-hidden="true"></i>
                     我的等级
@@ -272,8 +296,8 @@
                     <i class="fa fa-window-restore" aria-hidden="true"></i>
                     发布帖子
                 </div>
-                <div class="item-headline admin">
-                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                <div class="item-headline admin"  onclick="logout()">
+                    <i class="fa fa-calendar" aria-hidden="true" ></i>
                     退出登录
                 </div>
             </div>
