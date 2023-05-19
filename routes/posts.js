@@ -37,6 +37,7 @@ async function getById(id) {
 }
 
 // 通过用户Id
+// 5.19 添加跟帖数量字段
 async function getPostById(id,page = 1, size = 10) {
     page = (page - 1) * size;
     size = (page + 1) * size
@@ -50,7 +51,8 @@ async function getPostById(id,page = 1, size = 10) {
 				case 
 					When posts.userId not in (SELECT concern.concernUserId from concern where concern.userId = ?) then '关注'
 					When posts.userId in (SELECT concern.concernUserId from concern where concern.userId = ?) then '已关注'
-				END AS isConcern 
+				END AS isConcern ,
+                (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
             from posts 
         Left Join user
         On posts.userId = user.userId Limit ?,? `, [id, id,page,size], (err, val) => {
