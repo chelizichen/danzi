@@ -13,6 +13,11 @@
         function toDetail(id){
             window.location.href = "/detail?id="+id
         }
+
+        function to(path){
+            location.href = path
+        }
+
     </script>
     <style>
         *{
@@ -76,6 +81,7 @@
             margin-bottom: 10px;
             border: 1px solid #ccc;
             padding: 10px;
+            cursor: pointer;
         }
 
         li:hover {
@@ -168,6 +174,39 @@
             justify-content: center;
         }
 
+        .card-widget {
+            overflow: hidden;
+            margin: 10px 0;
+            border-radius: 3px;
+            background: #fff;
+            -webkit-box-shadow: 0 4px 8px 6px rgba(7, 17, 27, .06);
+            box-shadow: 0 4px 8px 6px rgba(7, 17, 27, .06);
+            -webkit-transition: all .3s;
+            -moz-transition: all .3s;
+            -o-transition: all .3s;
+            -ms-transition: all .3s;
+            transition: all .3s;
+            width: 20%;
+            position:fixed;
+            left: 75%;
+            top: 25%;
+        }
+        .card-content {
+            padding: 1rem 1.2rem;
+        }
+        .admin{
+            padding: 20px;
+            cursor: pointer;
+        }
+        .admin:hover{
+            background-color: #00BCD4;
+            transform: translate(12px, 10%);
+            transition: all 2s;
+            font-weight: 400;
+            color: rgb(255, 255, 255);
+
+        }
+
     </style>
 </head>
 <body>
@@ -192,7 +231,7 @@
             <ul>
                 <% for(var i=0; i<list.length; i++) {%>
                 <% let item = list[i] %>
-                <li class="post-item">
+                <li class="post-item" onclick="toDetail('<%= item.id%>')">
                     <div class="post-info" >
                         <div class="post-user">
                             <%= item.truthName   %> 
@@ -203,13 +242,13 @@
                             <%= item.isConcern %>
                         </div>
                     </div>
-                    <div onclick="toDetail('<%= item.id%>')" class="post-title"> <%= item.title  %></div>
+                    <div class="post-title"> <%= item.title  %></div>
                     <p class="post-content"> <%= item.content  %> </p>
                     <img src="/posts/<%= item.img %>" class="post-img"/>
                     <div class="post-meta">
                         <div class="post-type"><%= item.detailType %> </div> 
                         <div>
-                            <i class="fa fa-eye" aria-hidden="true"></i> <%= item.views  %>  <i class="fa fa-thumbs-up" aria-hidden="true"></i>  <%= item.like  %> | <i class="fa fa-comment" aria-hidden="true"></i> <%= item.like  %>
+                            <i class="fa fa-eye" aria-hidden="true"></i> <%= item.views  %>  <i class="fa fa-thumbs-up" aria-hidden="true"></i>  <%= item.likes  %> | <i class="fa fa-comment" aria-hidden="true"></i> <%= item.FollowNum  %>
                         </div>
 
                     </div>
@@ -218,6 +257,28 @@
             </ul>
         </section>
     </main>
+    <div>
+        <div class="card-widget card-announcement">
+            <div class="card-content">
+                <div class="item-headline admin">
+                    <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                    我的发帖
+                </div>
+                <div class="item-headline admin">
+                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                    我的等级
+                </div>
+                <div class="item-headline admin" onclick="to('/posts')">
+                    <i class="fa fa-window-restore" aria-hidden="true"></i>
+                    发布帖子
+                </div>
+                <div class="item-headline admin">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                    退出登录
+                </div>
+            </div>
+        </div>
+    </div>
     <footer>
         <p>&copy; 2023 Community Forum. All rights reserved.</p>
     </footer>

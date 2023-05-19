@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum Post Detail</title>
+    <title>
+        <%= data.title %>
+    </title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -63,6 +65,9 @@
             border-radius: 0.5rem;
             margin: 1rem 0 0 50%;
             transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .comment-actions {
@@ -88,18 +93,65 @@
     </style>
     <script>
         let currId = 0;
-        function comment(vm){
+        function comment(vm) {
             let _data = $(vm).attr("attr-id")
             currId = _data
             let _name = $(vm).attr("attr-name")
             console.log(_name);
             $("#comment").val(`回复${_name}：`)
         }
+
+        function checkContent(){
+            let val = $("#comment").val()
+            if(val){
+                if(/回复(.*?)：/.test(val)){
+                    let _content = val.replace(/回复(.*?)：/,"")
+                    if(_content){
+                        return true
+                    }
+                    return false
+                }
+                return true
+            }
+            return false
+        }
+
+        function sendCommoent() {
+            let check = checkContent()
+            if(!check){
+                alert("请输入评论内容")
+                return false
+            }
+            const postId = $("#postId").attr("attr-postId")
+
+            let _currId = currId == 0?$("#postId").attr("attr-userId"):currId;
+
+            const _userInfo = localStorage.getItem("userInfo")
+            const userInfo = JSON.parse(_userInfo)
+
+            const content = $("#comment").val().replace(/回复(.*?)：/,"")
+            const item = {
+                postId,
+                toUserId: _currId,
+                content,
+                userId: userInfo.userId || userInfo.id
+            }
+
+            axios.post("/post/savePost",item).then(res=>{
+                console.log(res);
+                if(res.data.affectedRows >= 1){
+                    alert("评论成功")
+                    // window.ref
+                    location.reload()
+                }
+            })
+
+        }
     </script>
 </head>
 
 <body>
-    <div class="contents">
+    <div class="contents" id="postId" attr-postId="<%= data.id %>" attr-userId="<%= data.userId %>">
         <h1>
             <%= data.title %> <span style="font-size: 24px;"> By <%= data.username %></span>
         </h1>
@@ -111,8 +163,13 @@
             <% let item=list[i] %>
                 <div class="comment">
                     <div class="comment-author">
-                        <%= item.userDetail %> <span>回复</span>
+                        <% if(item.userDetail == item.toUserDetail ){%>
+                            <div>楼主</div>
+                        <% }else{ %>
+                        <%= data.userId == item.userId ?"楼主":item.userDetail %> <span>回复</span>
                             <%= item.toUserDetail %>
+                        <% } %>
+
                     </div>
                     <p>
                         <%= item.content %>
@@ -121,14 +178,15 @@
                         <div>
                             <i class="fa fa-thumbs-up" aria-hidden="true"
                                 style="color: #1DA1F2;cursor: pointer;"></i><span>
-                                <%= item.like %>
+                                <%= item.likes %>
                             </span>
 
                             <i class="fa fa-thumbs-down" aria-hidden="true" style="cursor: pointer;"></i><span>
-                                <%= item.disLike %>
+                                <%= item.disLikes %>
                             </span>
                         </div>
-                        <button class="reply-button" onclick="comment(this)" attr-id="<%= item.userId%> " attr-name="<%= item.userDetail %>">回复</button>
+                        <button class="reply-button" onclick="comment(this)" attr-id="<%= item.userId%>"
+                            attr-name="<%= item.userDetail %>">回复</button>
                     </div>
                 </div>
                 <% } %>
@@ -137,7 +195,9 @@
                         <h2>添加评论</h2>
                         <form>
                             <textarea id="comment" name="comment" rows="6" style="width: 100%;" required></textarea><br>
-                            <button class="submit">Submit</button>
+                            <!-- <button class="submit" onclick="sendCommoent()">Submit</button> -->
+                            <div class="submit" onclick="sendCommoent()">Submit</div>
+
                         </form>
                     </div>
     </div>

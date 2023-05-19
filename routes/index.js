@@ -56,7 +56,7 @@ router.get('/userInfo/:id', function(req, res, next) {
 router.get('/community/:id', async function(req, res) {
   const {id} = req.params;
   const data = await getPostById(id)
-  console.log(data);
+  console.log(1,data[0]);
   res.render('community',{
     list:data
   })

@@ -211,8 +211,41 @@ router.get("/getDetailByPostId",async function(req,res){
     }catch(e){
         throw new Error(e)
     }
-    
+})
 
+function savePost(item){
+    const {postId , toUserId ,content,like = "0",disLike = "0" , userId } = item;
+    const releaseTime = moment(moment.now()).format("YYYY-MM-DD hh:mm:ss")
+    return new Promise((resolve, reject) => {
+        pool.query(`
+        insert into follows (
+            postId,
+            toUserId,
+            content,
+            likes,
+            disLikes,
+            userId,
+            releaseTime
+            )values(
+                ?,?,?,?,?,?,?
+            )
+            `,[Number(postId),Number(toUserId),content,like,disLike,Number(userId),releaseTime],function(err,res){
+                if(err){
+                    reject(err)
+                }
+                resolve(res)
+            })
+    })
+}
+
+router.post("/savePost",async function(req,res){
+    const {body} = req;
+    try{
+        const data = await savePost(body)
+        res.send(data)
+    }catch(e){
+        throw new Error(e)
+    }
 })
 
 module.exports = {
