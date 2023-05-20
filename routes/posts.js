@@ -11,7 +11,7 @@ async function getById(id, page = 1, size = 10) {
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
-            Else "原神"
+            Else "其他"
         End As detailType,
 				case 
 					When posts.userId not in (SELECT concern.concernUserId from concern where concern.userId = ?) then '关注'
@@ -63,7 +63,7 @@ async function getPostById(id, page = 1, size = 10) {
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
-            Else "原神"
+            Else "其他"
         End As detailType,
 				case 
 					When posts.userId not in (SELECT concern.concernUserId from concern where concern.userId = ?) then '关注'
@@ -267,7 +267,7 @@ router.post("/saveFollows", async function (req, res) {
 
 
 function savePosts(item) {
-    let { title, type, views = 0, likes = 0, content, img, userId } = item;
+    let { title, type=3, views = 0, likes = 0, content, img = "", userId } = item;
     img = img.replace("public/posts/","")
     const releaseTime = moment(moment.now()).format("YYYY-MM-DD hh:mm:ss")
     return new Promise((resolve, reject) => {
@@ -293,10 +293,25 @@ function savePosts(item) {
     })
 }
 
+function updateUserLevel(id) {
+    return new Promise((resolve, reject) => {
+        pool.query('UPDATE user SET level = level + 1 WHERE userId = ?', [id], (ERR, RES) => {
+            if (ERR) {
+                reject(ERR)
+            }
+            resolve(RES)
+        })
+    })
+}
+
+// 每发一次帖 等级涨1
 router.post("/savePosts", async function (req, res) {
     const { body } = req;
+    const { userId } = body
     try {
         const data = await savePosts(body)
+        // 添加等级
+        updateUserLevel(userId)
         res.send(data)
     } catch (e) {
         throw new Error(e)

@@ -1,46 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Forum - Post List</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         // axios.get("/post/getPostsById",{params:{id:"1"}}).then(res=>{
         //     console.log(res);
         // })
-        function toDetail(id){
-            window.location.href = "/detail?id="+id
+        function toDetail(id) {
+            window.location.href = "/detail?id=" + id
         }
 
-        function to(path){
+        function to(path) {
             location.href = path
         }
 
-        function logout(){
+        function logout() {
             alert("您已退出登录")
             location.href = "/login"
         }
 
-        function showMyPosts(){
+        function showMyPosts() {
             let item = JSON.parse(localStorage.getItem("userInfo"))
             let userId = item.userId || item.id
-            location.href = "/community/"+userId +"?only=true"
+            location.href = "/community/" + userId + "?only=true"
         }
 
-        function showAllPosts(){
+        function showAllPosts() {
             let item = JSON.parse(localStorage.getItem("userInfo"))
             let userId = item.userId || item.id
-            location.href = "/community/"+userId
+            location.href = "/community/" + userId
+        }
+
+        function quickPost(){
+            const title = $('#title').val();
+            const content = $('#content').val();
+            const _userInfo = localStorage.getItem("userInfo")
+            const userInfo = JSON.parse(_userInfo)
+            const data = {
+                title,
+                content,
+                userId: userInfo.userId || userInfo.id
+            }
+            axios.post("/post/savePosts",data).then(res=>{
+                console.log(res);
+                if(res.data.affectedRows >= 1){
+                    alert("发布成功")
+                    // window.ref
+                }
+            })
         }
 
     </script>
     <style>
-        *{
+        * {
             margin: 0;
             padding: 0;
         }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -58,7 +83,7 @@
         }
 
         header nav {
-            margin: 20px 0 0 0 ;
+            margin: 20px 0 0 0;
         }
 
         nav ul {
@@ -105,9 +130,10 @@
             background-color: #f4f4f4;
         }
 
-        #post-list{
+        #post-list {
             width: 100%;
         }
+
         .post-info {
             display: flex;
             justify-content: space-between;
@@ -133,11 +159,13 @@
             justify-content: space-between;
             margin-bottom: -10px;
         }
-        .main{
+
+        .main {
             width: 50%;
-            margin:  30px 25%;
+            margin: 30px 25%;
         }
-        .btn-follow{
+
+        .btn-follow {
             background-color: #1DA1F2;
             color: #fff;
             padding: 10px 20px;
@@ -147,21 +175,26 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .btn-follow:hover{
+
+        .btn-follow:hover {
             background-color: #0C8FD6;
         }
-        .post-user{
+
+        .post-user {
             font-size: 24px;
         }
-        .post-user .post-time{
+
+        .post-user .post-time {
             font-size: 14px;
             font-weight: 400;
             margin-left: 5px;
         }
-        .post-item{
+
+        .post-item {
             padding: 20px;
         }
-        .post-level{
+
+        .post-level {
             font-size: 12px;
             font-weight: 700;
             width: 40px;
@@ -171,19 +204,21 @@
             color: #fff;
             margin-left: 5px;
         }
-        .post-img{
+
+        .post-img {
             width: 300px;
             height: 300px;
             margin-bottom: 20px;
         }
-        .post-type{
+
+        .post-type {
             font-size: 12px;
             font-weight: 700;
             height: 16px;
             /* width: 34px; */
             padding: 3px;
             line-height: 12px;
-            background-color:#1DA1F2;
+            background-color: #1DA1F2;
             color: #fff;
             margin-left: 5px;
             display: flex;
@@ -204,28 +239,35 @@
             -ms-transition: all .3s;
             transition: all .3s;
             width: 20%;
-            position:fixed;
+            position: fixed;
             left: 75%;
             top: 25%;
         }
+
         .card-content {
             padding: 1rem 1.2rem;
         }
-        .admin{
+
+        .admin {
             padding: 20px;
             cursor: pointer;
         }
-        .admin:hover{
-            background-color: #00BCD4;
+
+        .fast{
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .admin:hover {
+            background-color: #017180;
             transform: translate(12px, 10%);
             transition: all 2s;
             font-weight: 400;
             color: rgb(255, 255, 255);
-
         }
-
     </style>
 </head>
+
 <body>
     <header>
         <h1>米哈游社区</h1>
@@ -247,30 +289,43 @@
         <section id="post-list">
             <ul>
                 <% for(var i=0; i<list.length; i++) {%>
-                <% let item = list[i] %>
-                <li class="post-item" onclick="toDetail('<%= item.id%>')">
-                    <div class="post-info" >
-                        <div class="post-user">
-                            <%= item.truthName   %> 
-                            <span class="post-level"> Lv<%= item.level %> </span> 
-                            <span class="post-time"> <%= item.releaseTime %> </span> 
-                        </div>
-                        <div class="btn-follow">
-                            <%= item.isConcern %>
-                        </div>
-                    </div>
-                    <div class="post-title"> <%= item.title  %></div>
-                    <p class="post-content"> <%= item.content  %> </p>
-                    <img src="/posts/<%= item.img %>" class="post-img"/>
-                    <div class="post-meta">
-                        <div class="post-type"><%= item.detailType %> </div> 
-                        <div>
-                            <i class="fa fa-eye" aria-hidden="true"></i> <%= item.views  %>  <i class="fa fa-thumbs-up" aria-hidden="true"></i>  <%= item.likes  %> | <i class="fa fa-comment" aria-hidden="true"></i> <%= item.FollowNum  %>
-                        </div>
+                    <% let item=list[i] %>
+                        <li class="post-item" onclick="toDetail('<%= item.id%>')">
+                            <div class="post-info">
+                                <div class="post-user">
+                                    <%= item.truthName %>
+                                        <span class="post-level"> Lv<%= item.level %> </span>
+                                        <span class="post-time">
+                                            <%= item.releaseTime %>
+                                        </span>
+                                </div>
+                                <div class="btn-follow">
+                                    <%= item.isConcern %>
+                                </div>
+                            </div>
+                            <div class="post-title">
+                                <%= item.title %>
+                            </div>
+                            <p class="post-content">
+                                <%= item.content %>
+                            </p>
+                            <%if(item.img){%>
+                                <img src="/posts/<%= item.img %>" class="post-img" />
+                            <%}%>
+                            <div class="post-meta">
+                                <div class="post-type">
+                                    <%= item.detailType %>
+                                </div>
+                                <div>
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <%= item.views %> <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                        <%= item.likes %> | <i class="fa fa-comment" aria-hidden="true"></i>
+                                            <%= item.FollowNum %>
+                                </div>
 
-                    </div>
-                </li>
-                <% } %>
+                            </div>
+                        </li>
+                        <% } %>
             </ul>
         </section>
     </main>
@@ -278,28 +333,55 @@
         <div class="card-widget card-announcement">
             <div class="card-content">
                 <% if(only) {%>
-                <div class="item-headline admin" onclick="showAllPosts()">
-                    <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                    全部发帖
-                </div>
-                <%}else{%>
-                    <div class="item-headline admin" onclick="showMyPosts()">
+                    <div class="item-headline admin" onclick="showAllPosts()">
                         <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                        我的发帖
+                        全部发帖
                     </div>
-                <%}%>
-                <div class="item-headline admin">
-                    <i class="fa fa-exchange" aria-hidden="true"></i>
-                    我的等级
-                </div>
-                <div class="item-headline admin" onclick="to('/posts')">
-                    <i class="fa fa-window-restore" aria-hidden="true"></i>
-                    发布帖子
-                </div>
-                <div class="item-headline admin"  onclick="logout()">
-                    <i class="fa fa-calendar" aria-hidden="true" ></i>
-                    退出登录
-                </div>
+                    <%}else{%>
+                        <div class="item-headline admin" onclick="showMyPosts()">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                            我的发帖
+                        </div>
+                        <%}%>
+                            <!-- <div class="item-headline admin">
+                                <i class="fa fa-exchange" aria-hidden="true"></i>
+                                我的等级
+                            </div> -->
+                            <div class="item-headline admin" onclick="to('/posts')">
+                                <i class="fa fa-window-restore" aria-hidden="true"></i>
+                                发布帖子
+                            </div>
+                            <div class="item-headline fast">
+                                <p>
+                                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                                    <a  data-bs-toggle="collapse"
+                                        href="#collapseExample" role="button" aria-expanded="false"
+                                        aria-controls="collapseExample">
+                                        急速发布
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseExample" style="">
+                                    <div class="card card-body">
+                                        <div>
+                                            <div class="form-group">
+                                                <label for="title">标题</label>
+                                                <input type="text" id="title" name="title" class="form-control" placeholder="请输入标题">
+                                              </div>
+                                          
+                                              <div class="form-group">
+                                                <label for="content">内容</label>
+                                                <textarea id="content" name="content" class="form-control" placeholder="请输入内容"></textarea>
+                                              </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" onclick="quickPost()">发布</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-headline admin" onclick="logout()">
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                退出登录
+                            </div>
+
             </div>
         </div>
     </div>
@@ -307,4 +389,5 @@
         <p>&copy; 2023 Community Forum. All rights reserved.</p>
     </footer>
 </body>
+
 </html>

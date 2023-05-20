@@ -123,14 +123,14 @@
 		function toUserInfo(){
 			let _userInfo = localStorage.getItem("userInfo")
 			let userInfo = JSON.parse(_userInfo)
-			let { id } = userInfo
-			window.open("/userInfo/"+id);
+			let { userId } = userInfo
+			window.open("/userInfo/"+userId);
 		}
 		function toCommunity(){
 			let _userInfo = localStorage.getItem("userInfo")
 			let userInfo = JSON.parse(_userInfo)
-			let { id } = userInfo
-			window.open("/community/"+id);
+			let { userId } = userInfo
+			window.open("/community/"+userId);
 		}
 	</script>
 </head>
