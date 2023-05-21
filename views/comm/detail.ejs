@@ -90,6 +90,20 @@
         .reply-button:hover {
             background-color: #454545;
         }
+        .img{
+            width: 400px;
+            height: 400px;
+        }
+        .post-level {
+            font-size: 12px;
+            font-weight: 700;
+            width: 40px;
+            height: 12px;
+            line-height: 12px;
+            background-color: gold;
+            color: #fff;
+            margin-left: 5px;
+        }
     </style>
     <script>
         let currId = 0;
@@ -151,13 +165,15 @@
 </head>
 
 <body>
+    <!-- <%= Object.keys(data).toString() %> -->
     <div class="contents" id="postId" attr-postId="<%= data.id %>" attr-userId="<%= data.userId %>">
         <h1>
-            <%= data.title %> <span style="font-size: 24px;"> By <%= data.username %></span>
+            <%= data.title %> <span style="font-size: 24px;"> By <%= data.username %>  <span class="post-level"> Lv<%= data.level %> </span></span>
         </h1>
         <div class="post-content">
             <%= data.content %>
         </div>
+        <img src="/posts/<%= data.img %>" class="img"/>
 
         <% for(var i=0; i<list.length; i++) {%>
             <% let item=list[i] %>
@@ -167,7 +183,7 @@
                             <div>楼主</div>
                         <% }else{ %>
                         <%= data.userId == item.userId ?"楼主":item.userDetail %> <span>回复</span>
-                            <%= item.toUserDetail %>
+                            <%= data.userId == item.toUserId ?"楼主":item.toUserDetail %>
                         <% } %>
 
                     </div>

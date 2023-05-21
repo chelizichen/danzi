@@ -48,7 +48,7 @@ async function getById(id, page = 1, size = 10) {
                 return item
             })
 
-            resolve(data)
+            resolve(data[0])
         })
     })
 }
@@ -72,7 +72,7 @@ async function getPostById(id, page = 1, size = 10) {
                 (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
             from posts 
         Left Join user
-        On posts.userId = user.userId Limit ?,? `, [id, id, page, size], (err, val) => {
+        On posts.userId = user.userId order by posts.releaseTime desc Limit ?,? `, [id, id, page, size], (err, val) => {
             if (err) {
                 reject(err)
             }

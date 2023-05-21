@@ -42,7 +42,8 @@
       if (data.data.code == "-1") {
         window.alert("登陆失败")
       } else {
-        window.open("/homeYs")
+        console.log("崩坏登录");
+        window.open("/homeBh")
         let { data: userInfo } = data.data;
         let _stf_ = JSON.stringify(userInfo);
         localStorage.setItem("userInfo", _stf_)

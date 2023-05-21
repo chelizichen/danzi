@@ -21,9 +21,26 @@ router.get('/loginYs', function(req, res, next) {
 
 router.get('/homeYs', function(req, res, next) {
   res.render("ys/home",{
-    title:"原神登录界面"
+    title:"原神主页"
   })
 });
+
+router.get('/homeBh', function(req, res, next) {
+  res.render("bh/home",{
+    title:"崩坏界面"
+  })
+});
+
+router.get('/bh/roles', function(req, res, next) {
+  res.render("bh/roles",{
+    title:"崩坏角色界面"
+  })
+});
+
+router.get('/bh/world', function(req, res, next) {
+  res.render("bh/world")
+});
+
 
 router.get('/news', function(req, res, next) {
   res.render("news")
@@ -75,6 +92,7 @@ router.get('/detail', async function(req, res) {
   const {id} = req.query;
   const data = await getDetailByPostId(id)
   const _data = await getById(id)
+  // console.log(_data);
   console.log(data);
   res.render('comm/detail',{
     id,
