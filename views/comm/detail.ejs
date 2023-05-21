@@ -166,6 +166,7 @@
 
 <body>
     <!-- <%= Object.keys(data).toString() %> -->
+    
     <div class="contents" id="postId" attr-postId="<%= data.id %>" attr-userId="<%= data.userId %>">
         <h1>
             <%= data.title %> <span style="font-size: 24px;"> By <%= data.username %>  <span class="post-level"> Lv<%= data.level %> </span></span>
@@ -174,6 +175,12 @@
             <%= data.content %>
         </div>
         <img src="/posts/<%= data.img %>" class="img"/>
+        <div>
+            <a href="<%= data.tags %>">
+                网页链接
+            </a>        
+        </div>
+
 
         <% for(var i=0; i<list.length; i++) {%>
             <% let item=list[i] %>

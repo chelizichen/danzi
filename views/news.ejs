@@ -71,12 +71,17 @@
             z-index: -9999;
         }
     </style>
+    <script>
+        function toDetail(id) {
+            window.location.href = "/detail?id=" + id
+        }
+    </script>
 </head>
 
 <body>
     <div class="shell" id='scroll'>
-        <div><img src="images/news/9.png" alt=""></div>
-        <div><img src="images/news/10.png" alt=""></div>
+        <div><img src="images/news/9.png" alt="" onclick="toDetail(4)"></div>
+        <div><img src="images/news/10.png" alt="" onclick="toDetail(5)"></div>
         <div><img src="images/news/11.png" alt=""></div>
         <div><img src="images/news/12.png" alt=""></div>
         <div><img src="images/news/13.png" alt=""></div>

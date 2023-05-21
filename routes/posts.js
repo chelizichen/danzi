@@ -11,6 +11,8 @@ async function getById(id, page = 1, size = 10) {
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
+            When posts.type = 4 Then '新闻' 
+
             Else "其他"
         End As detailType,
 				case 
@@ -47,8 +49,7 @@ async function getById(id, page = 1, size = 10) {
                 }
                 return item
             })
-            console.log(data);
-            resolve(data[0])
+            resolve(data)
         })
     })
 }
@@ -63,6 +64,8 @@ async function getPostById(id, page = 1, size = 10) {
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
+            When posts.type = 4 Then '新闻' 
+
             Else "其他"
         End As detailType,
 				case 
@@ -109,6 +112,7 @@ async function  getOne(id){
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
+            When posts.type = 4 Then '新闻' 
             Else "其他"
         End As detailType,
                 (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
@@ -172,6 +176,8 @@ function getPostList(page = 1, size = 10) {
         case 
             When posts.type = 1 Then '原神'
             When posts.type = 2 Then '崩坏三' 
+            When posts.type = 4 Then '新闻' 
+
             Else "原神"
         End As detailType
             from posts 

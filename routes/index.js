@@ -74,6 +74,7 @@ router.get('/community/:id', async function (req, res) {
   let data = undefined;
   if (only) {
     data = await getById(id)
+    console.log("data",data);
   } else {
     data = await getPostById(id)
   }
@@ -101,6 +102,9 @@ router.get('/detail', async function (req, res) {
   })
 });
 
-
+router.get('/news/detail', function (req, res) {
+  const { id } = req.params;
+  res.render('news/detail')
+});
 
 module.exports = router;
