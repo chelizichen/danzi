@@ -47,13 +47,13 @@ async function getById(id, page = 1, size = 10) {
                 }
                 return item
             })
-
+            console.log(data);
             resolve(data[0])
         })
     })
 }
 
-// 通过用户Id
+// 通过用户Id拿到帖子
 // 5.19 添加跟帖数量字段
 async function getPostById(id, page = 1, size = 10) {
     page = (page - 1) * size;
@@ -99,6 +99,50 @@ async function getPostById(id, page = 1, size = 10) {
             })
 
             resolve(data)
+        })
+    })
+}
+
+async function  getOne(id){
+    return new Promise((resolve, reject) => {
+        pool.query(`select posts.*,user.*,
+        case 
+            When posts.type = 1 Then '原神'
+            When posts.type = 2 Then '崩坏三' 
+            Else "其他"
+        End As detailType,
+                (SELECT COUNT(*) FROM follows WHERE posts.id = follows.postId) AS FollowNum
+            from posts
+        Left Join user
+        On posts.userId = user.userId 
+        where posts.id = ?
+        `, [id], (err, val) => {
+            if (err) {
+                reject(err)
+            }
+            let currentTime = moment()
+            let _data = val;
+
+            let data = _data.map(item => {
+                // let _time = moment.ismoment(item.releaseTime)
+
+                // 假设要判断的时间是 "2023-05-16 15:30:00"
+                var targetTime = moment(item.releaseTime);
+
+                // 判断时间是否为今天
+                if (targetTime.isSame(currentTime, 'day')) {
+                    // 如果是今天，则显示几个小时前
+                    var hoursAgo = currentTime.diff(targetTime, 'hours');
+                    item.releaseTime = hoursAgo + '小时前';
+                } else {
+                    // 如果不是今天，则显示几月几日
+                    var formattedDate = targetTime.format('MMMM DD');
+                    item.releaseTime = formattedDate
+                }
+                return item
+            })
+            console.log(data);
+            resolve(data[0])
         })
     })
 }
@@ -325,6 +369,8 @@ module.exports = {
     getPostById,
     getPostList,
     getDetailByPostId,
-    getById
+    getById,
+    getOne,
+    addView
 };
 
